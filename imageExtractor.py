@@ -5,8 +5,8 @@ import numpy as np
 import random
 import string
 
-imagepath = "/home/sam/Downloads/train_5/"
-face_classifier = cv.CascadeClassifier("/home/sam/anaconda3/lib/python3.6/site-packages/cv2/data/haarcascade_frontalface_alt.xml")
+imagepath = "./test/test/"
+#face_classifier = cv.CascadeClassifier("/home/sam/anaconda3/lib/python3.6/site-packages/cv2/data/haarcascade_frontalface_alt.xml")
 net = cv.dnn.readNetFromCaffe("deploy.prototxt.txt", "res10_300x300_ssd_iter_140000.caffemodel")
 filename_length = 15
 
@@ -15,16 +15,16 @@ def getRandomFileName():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(filename_length))
 
 
-def getFaces(path, conf = 0.5):
+def getFaces(image, conf = 0.5):
     """
     (String, Int) -> (faces[numpy])
     Precondition: path denotes an image that exists
     Returns a list of faces found in the image if none
     are found returns and empty list
     """
-    img = cv.imread(path)
+    
 
-    image = cv.imread(path)
+    
     (h, w) = image.shape[:2]
     blob = cv.dnn.blobFromImage(cv.resize(image, (300, 300)), 1.0, (300, 300), (103.93, 116.77, 123.68))
     net.setInput(blob)
@@ -48,6 +48,8 @@ def getFaces(path, conf = 0.5):
     
 
     return face_arr
+def getImage(path):
+    return cv.imread(path)
 
 def removeDuplicates(targetdir):
     """
@@ -103,9 +105,10 @@ def imageExtractor(imagepath, resultpath):
         
         try: 
             
-            faces = getFaces(imagepath + file)
-            
-            
+            faces = getFaces(getImage(imagepath + file))
+            filename = resultpath + getRandomFileName()
+            while os.path.exists(filename):
+                    filename = resultpath + getRandomFileName()
             count += 1
             if count % 100 == 0: 
                 print(count, "images processed.")
@@ -114,9 +117,8 @@ def imageExtractor(imagepath, resultpath):
             if len(faces) > 1:
                 faceCount = 1
                 
-                filename = resultpath + getRandomFileName()
-                while os.path.exists(filename):
-                    filename = resultpath + getRandomFileName()
+                
+                
                     
                 name, extension = os.path.splitext(resultpath + file)
                 
@@ -143,4 +145,3 @@ def imageExtractor(imagepath, resultpath):
 
 
 
-imageExtractor(imagepath, "/home/sam/Desktop/paintings/")

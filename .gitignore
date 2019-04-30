@@ -1,2 +1,18 @@
 ./CSV/
 
+
+image_too_small/
+
+models/
+
+small_images/
+
+test/
+
+test_images/
+
+train/
+
+train_images/
+
+*.zip
