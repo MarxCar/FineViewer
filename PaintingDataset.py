@@ -7,7 +7,7 @@ import imageExtractor
 import numpy as np
 import urllib
 import xlrd
-
+import os
  
 
 def url_to_image(url):
@@ -25,33 +25,38 @@ def getOnlineFaces(file,resultpath):
 
 	count = 0
 	faces_found = 0
-	for rowx in range(sheets.nrows):
+	for rowx in range(1,sheets.nrows):
 		cols = sheets.row_values(rowx)
-		
-		faces = imageExtractor.getFaces(url_to_image(cols[0]))
-		filename = resultpath + imageExtractor.getRandomFileName()
-		while os.path.exists(filename):
-			filename = resultpath + getRandomFileName()
+		try:
 
-		count += 1
-		_,extension = os.path.splitext(cols[0])
+			faces = imageExtractor.getFaces(url_to_image(cols[0]))
+			filename = resultpath + imageExtractor.getRandomFileName()
+			while os.path.exists(filename):
+				filename = resultpath + getRandomFileName()
 
-
-		
-		print(count, "images processed.")
-		print(faces_found, "faces found.")
+			count += 1
+			_,extension = os.path.splitext(cols[0])
 
 
-		if len(faces) > 1:
-			faceCount = 1
-			for face in faces:
-				print(filename + "-" + str(faceCount) + extension)
-				cv.imwrite(filename + "-" + str(faceCount) + extension, face)
-				faceCount += 1
-			faces_found += len(faces)
-		elif len(faces) == 1:
-			cv.imwrite(filename, faces[0])
-			faces_found += 1
+			
+			print(count, "images processed.")
+			print(faces_found, "faces found.")
+
+
+			if len(faces) > 1:
+				faceCount = 1
+				for face in faces:
+					print(filename + "-" + str(faceCount) + extension)
+					
+					cv.imwrite(filename + "-" + str(faceCount) + extension, face)
+					faceCount += 1
+				faces_found += len(faces)
+			elif len(faces) == 1:
+
+				cv.imwrite(filename + extension, faces[0])
+				faces_found += 1
+		except:
+			pass
 
 
 

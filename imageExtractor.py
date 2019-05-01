@@ -80,18 +80,24 @@ def removeDuplicates(targetdir):
 
 
 
-def imageExtractor(imagepath, resultpath):
+def imageExtractor(imagepath, resultpath, subFolders=False):
     """
     (String, String, Int()) -> None
     Precondition: imagepath and resultpath exist
     Extracts all faces found in the images from imagepath 
-    and puts them as seperate images in resultpath
+    and puts them as seperate images in resultpath. If subFolders is True,
+    all the files in the subdirectories of imagepath is run
     """
     if not os.path.exists(imagepath):
         print("Image path does not exist")
     if not os.path.exists(resultpath):
         os.makedirs(resultpath)
-    files = os.listdir(imagepath)
+    if subFolders:
+
+        files = [os.path.join(root, file) for root, _, files in os.walk(imagepath) for file in files]
+    else:
+        files = os.listdir(imagepath)
+    
     
     count = 0
     corruptedCount = 0
@@ -101,43 +107,48 @@ def imageExtractor(imagepath, resultpath):
 
 
 
-    for file in files:
+    for file in files[1:]:
+        union_file = imagepath + file
+        name, extension = os.path.splitext(union_file)
+
+
+        if subFolders:
+            union_file = file
         
-        try: 
+
+        faces = getFaces(getImage(union_file))
+        filename = resultpath + getRandomFileName()
+        
+
+
+        while os.path.exists(filename):
+                filename = resultpath + getRandomFileName()
+        count += 1
+
+
+        if count % 100 == 0: 
+            print(count, "images processed.")
+            print(faces_found, "faces found.")
+       
+        if len(faces) > 1:
+            faceCount = 1
             
-            faces = getFaces(getImage(imagepath + file))
-            filename = resultpath + getRandomFileName()
-            while os.path.exists(filename):
-                    filename = resultpath + getRandomFileName()
-            count += 1
-            if count % 100 == 0: 
-                print(count, "images processed.")
-                print(faces_found, "faces found.")
-           
-            if len(faces) > 1:
-                faceCount = 1
-                
-                
-                
-                    
-                name, extension = os.path.splitext(resultpath + file)
-                
-                for face in faces:
+            for face in faces:
 
-                    
-                    print(filename +  "-" + str(faceCount) + extension)
-                    cv.imwrite(filename +  "-" + str(faceCount) + extension, face)
-                    faceCount += 1
-                faces_found += len(faces)
-            elif len(faces) == 1:
                 
-                cv.imwrite(filename + extension,faces[0])
-                faces_found += 1
-            else:
-                no_faces_found += 1
+                print(filename +  "-" + str(faceCount) + extension)
+                cv.imwrite(filename +  "-" + str(faceCount) + extension, face)
+                faceCount += 1
+            faces_found += len(faces)
+        elif len(faces) == 1:
+            
+            cv.imwrite(filename + extension,faces[0])
+            faces_found += 1
+        else:
+            no_faces_found += 1
 
-        except:
-            corruptedCount += 1
+    
+        corruptedCount += 1
 
     print("Found", count, "usable images and", corruptedCount, "corrupted files")
     print(str(no_faces_found) + " files did not have faces. ")
@@ -145,3 +156,5 @@ def imageExtractor(imagepath, resultpath):
 
 
 
+
+imageExtractor("./cool_images/", "./vangogh/", True)
