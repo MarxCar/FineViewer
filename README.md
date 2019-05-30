@@ -10,7 +10,6 @@ I am hoping to build an latent space embedding that captures the wide array of a
 Models I am using:
 
 1. Plain VAE   (DONE)
-2. Deep Feature Consisten VAE with Perceptual Loss (In Training)
-3. Plain GAN (In Training)
-4. StyleGAN (???)
+2. Deep Feature Consisten VAE with Perceptual Loss (DONE)
+3. StyleGAN (DONE)
 
