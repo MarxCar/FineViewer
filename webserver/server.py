@@ -87,13 +87,14 @@ def randomFace():
 @app.route("/changeLatent", methods=["POST"])
 def changeLatent():
     data = {"success": False}
-    if params != None:
-        latent = np.load(flask.request.files["latent"])
+    if flask.request.files != None:
+        latent = np.load(flask.request.files["latent"])[0]
         dim = int(flask.request.values["dimension"])
-        operator = flask.requtes.values["operator"]
+        operator = flask.request.values["operator"]
         bytesIO = io.BytesIO()
         with graph.as_default():
             if operator == "add":
+                print(latent.shape)
                 image = model.addToLatent(latent, dim)
             elif operator == "sub":
                 image = model.subtractFromLatent(latent, dim)

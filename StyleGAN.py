@@ -489,13 +489,13 @@ class WGAN(object):
 
         idx = (np.abs(grid - val)).argmin()
         if idx != NUM_SIZE:
-            latent[dim] = grid[NUM_SIZE+1]
-        return self.imageFromLatent(latent)
+            latent[dim] = grid[idx+1]
+        return self.imageFromLatent(latent.reshape(1,128))
     def subtractFromLatent(self, latent, dim):
         val = latent[dim]
         grid = stats.norm.ppf(np.linspace(0.05, 0.95, 10))
 
         idx = (np.abs(grid - val)).argmin()
         if idx != 0:
-            latent[dim] = grid[NUM_SIZE - 1]
-        return self.imageFromLatent(latent)
+            latent[dim] = grid[idx-1]
+        return self.imageFromLatent(latent.reshape(1,128))
