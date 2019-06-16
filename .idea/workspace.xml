@@ -4,6 +4,7 @@
     <list default="true" id="af1931b7-892a-43b2-bf65-82a938864b6f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/StyleGAN.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/StyleGAN.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/StyleGAN.py" beforeDir="false" afterPath="$PROJECT_DIR$/StyleGAN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/webserver/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,7 +19,7 @@
         <entry file="file://$PROJECT_DIR$/webserver/server.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="794">
-              <caret line="86" selection-start-line="86" selection-end-line="86" />
+              <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
             </state>
           </provider>
         </entry>
@@ -26,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../Public/Miniconda3/Lib/site-packages/flask/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="621">
-              <caret line="1835" lean-forward="true" selection-start-line="1835" selection-end-line="1835" />
+            <state relative-caret-position="30685">
+              <caret line="1835" selection-start-line="1835" selection-end-line="1835" />
             </state>
           </provider>
         </entry>
@@ -35,8 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StyleGAN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7854">
-              <caret line="471" column="4" selection-start-line="471" selection-start-column="4" selection-end-line="471" selection-end-column="4" />
+            <state relative-caret-position="743">
+              <caret line="499" column="41" selection-start-line="499" selection-start-column="41" selection-end-line="499" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -88,6 +89,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane" />
       <pane id="Scope">
         <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
           <expand>
@@ -99,7 +101,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -190,6 +191,13 @@
     <entry file="file://$PROJECT_DIR$/q.png" />
     <entry file="file://$PROJECT_DIR$/t.png" />
     <entry file="file://$PROJECT_DIR$/ree.jpg" />
+    <entry file="file://$PROJECT_DIR$/../../../Public/Miniconda3/Lib/site-packages/flask/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30685">
+          <caret line="1835" selection-start-line="1835" selection-end-line="1835" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../../../Public/Miniconda3/Lib/site-packages/werkzeug/wsgi.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9503">
@@ -197,24 +205,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Public/Miniconda3/Lib/site-packages/flask/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="621">
-          <caret line="1835" lean-forward="true" selection-start-line="1835" selection-end-line="1835" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/StyleGAN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7854">
-          <caret line="471" column="4" selection-start-line="471" selection-start-column="4" selection-end-line="471" selection-end-column="4" />
+        <state relative-caret-position="743">
+          <caret line="499" column="41" selection-start-line="499" selection-start-column="41" selection-end-line="499" selection-end-column="41" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/webserver/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="794">
-          <caret line="86" selection-start-line="86" selection-end-line="86" />
+          <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
         </state>
       </provider>
     </entry>

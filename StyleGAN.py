@@ -17,9 +17,10 @@ BATCH_SIZE = 4
 directory = "Faces"
 n_images = 32132
 suff = 'jpg'
+NUM_SIZE = 10
 
 from AdaIN import AdaInstanceNormalization
-
+from scipy import stats
 #Style Z
 def noise(n):
     return np.random.normal(0.0, 1.0, size = [n, latent_size])
@@ -481,3 +482,20 @@ class WGAN(object):
         return np.concatenate(images, axis=1)
     def imageFromLatent(self, latent):
         return np.uint8(self.generator.predict([latent, noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
+
+    def addToLatent(self, latent, dim):
+        val = latent[dim]
+        grid = stats.norm.ppf(np.linspace(0.05,0.95, 10))
+
+        idx = (np.abs(grid - val)).argmin()
+        if idx != NUM_SIZE:
+            latent[dim] = grid[NUM_SIZE+1]
+        return self.imageFromLatent(latent)
+    def subtractFromLatent(self, latent, dim):
+        val = latent[dim]
+        grid = stats.norm.ppf(np.linspace(0.05, 0.95, 10))
+
+        idx = (np.abs(grid - val)).argmin()
+        if idx != 0:
+            latent[dim] = grid[NUM_SIZE - 1]
+        return self.imageFromLatent(latent)

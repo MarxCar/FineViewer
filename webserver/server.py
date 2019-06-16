@@ -8,7 +8,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Import StyleGAN
 sys.path.append("..")
-from StyleGAN import WGAN, noiseImage
+from StyleGAN import WGAN, noise
 
 # Load libraries
 import flask
@@ -55,6 +55,7 @@ def predict():
 
 @app.route("/interpolation", methods=["POST"])
 def interpolation():
+    data = {"success": False}
     params = flask.request.files
     if params != None:
         x1 = np.load(params["latent1"])
@@ -71,19 +72,37 @@ def interpolation():
             bytesIO.seek(0, 0)
             return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
     else:
-        return TypeError("Didn't send right parameters")
+        return flask.jsonify(data)
 
 @app.route("/randomFace", methods=["GET"])
 def randomFace():
-    data = {"success": False}
     bytesIO = io.BytesIO()
 
     with graph.as_default():
-        image = Image.fromarray(model.imageFromLatent(noiseImage(1)))
+        image = Image.fromarray(model.imageFromLatent(noise(1)))
         image.convert("RGB").save(bytesIO, format="PNG")
         bytesIO.seek(0, 0)
         return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
 
+@app.route("/changeLatent", methods=["POST"])
+def changeLatent():
+    data = {"success": False}
+    if params != None:
+        latent = np.load(flask.request.files["latent"])
+        dim = int(flask.request.values["dimension"])
+        operator = flask.requtes.values["operator"]
+        bytesIO = io.BytesIO()
+        with graph.as_default():
+            if operator == "add":
+                image = model.addToLatent(latent, dim)
+            elif operator == "sub":
+                image = model.subtractFromLatent(latent, dim)
+            else:
+                return flask.jsonify(data)
+            image = Image.fromarray(image)
+            image.convert("RGB").save(bytesIO, format="PNG")
+            bytesIO.seek(0, 0)
+            return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
 
 # start the flask app, allow remote connections 
 app.run(host='0.0.0.0')
