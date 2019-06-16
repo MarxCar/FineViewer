@@ -8,7 +8,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Import StyleGAN
 sys.path.append("..")
-from StyleGAN import WGAN
+from StyleGAN import WGAN, noiseImage
 
 # Load libraries
 import flask
@@ -66,12 +66,23 @@ def interpolation():
 
         with graph.as_default():
             image = Image.fromarray(model.interpolation(x1, x2, n))
-            print(image)
+
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
             return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
     else:
         return TypeError("Didn't send right parameters")
+
+@app.route("/randomFace", methods=["GET"])
+def randomFace():
+    data = {"success": False}
+    bytesIO = io.BytesIO()
+
+    with graph.as_default():
+        image = Image.fromarray(model.imageFromLatent(noiseImage(1)))
+        image.convert("RGB").save(bytesIO, format="PNG")
+        bytesIO.seek(0, 0)
+        return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
 
 
 # start the flask app, allow remote connections 
