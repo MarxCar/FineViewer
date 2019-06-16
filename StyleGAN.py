@@ -475,9 +475,9 @@ class WGAN(object):
         images = []
 
         for weight in weights:
-            temp = model.generator.predict([latent_a*(1-weight) + latent_b*weight, noiseImage(1), np.ones([1, 1])])
+            temp = self.generator.predict([latent_a*(1-weight) + latent_b*weight, noiseImage(1), np.ones([1, 1])])
             temp = np.uint8(temp.reshape(im_size,im_size,3)*255)
             images.append(temp)
         return np.concatenate(images, axis=1)
     def imageFromLatent(self, latent):
-        return np.uint8(model.generator.predict([latent, noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
+        return np.uint8(self.generator.predict([latent, noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
