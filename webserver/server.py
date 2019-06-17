@@ -84,6 +84,14 @@ def randomFace():
         bytesIO.seek(0, 0)
         return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
 
+@app.route("/randomLatent", methods=["GET"])
+def randomLatent():
+    bytesIO = io.BytesIO()
+    np.save(bytesIO, noise(1))
+    bytesIO.seek(0)
+    return flask.send_file(bytesIO, as_attachment=True, attachment_filename="latent.npy")
+
+
 @app.route("/changeLatent", methods=["POST"])
 def changeLatent():
     data = {"success": False}
