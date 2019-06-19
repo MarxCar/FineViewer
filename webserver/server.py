@@ -1,4 +1,4 @@
-# Ensure CPU Only 
+# Ensure CPU Only
 import os
 import sys
 import io
@@ -19,10 +19,12 @@ from keras.models import load_model
 import base64
 import numpy as np
 from PIL import Image
+from flask_cors import CORS, cross_origin
 
-# instantiate flask 
+# instantiate flask
 app = flask.Flask(__name__)
-
+cors = CORS(app)
+app.config["CORS_HEADERS"] = "Content-Type"
 # load the model, and pass in the custom metric function
 global graph
 graph = tf.get_default_graph()
@@ -32,6 +34,7 @@ model.load(61)
 
 # define a predict function as an endpoint
 @app.route("/predict", methods=["POST"])
+@cross_origin()
 def predict():
     data = {"success": False}
 
@@ -54,6 +57,7 @@ def predict():
 
 
 @app.route("/interpolation", methods=["POST"])
+@cross_origin()
 def interpolation():
     data = {"success": False}
     params = flask.request.files
@@ -75,16 +79,18 @@ def interpolation():
         return flask.jsonify(data)
 
 @app.route("/randomFace", methods=["GET"])
+@cross_origin()
 def randomFace():
     bytesIO = io.BytesIO()
-
+    data = {"success": True}
     with graph.as_default():
         image = Image.fromarray(model.imageFromLatent(noise(1)))
         image.convert("RGB").save(bytesIO, format="PNG")
-        bytesIO.seek(0, 0)
-        return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
+	data["image"] = base64.b64encode(bytesIO.getvalue());
+	return flask.jsonify(data)
 
 @app.route("/randomLatent", methods=["GET"])
+@cross_origin()
 def randomLatent():
     bytesIO = io.BytesIO()
     np.save(bytesIO, noise(1))
@@ -93,6 +99,7 @@ def randomLatent():
 
 
 @app.route("/changeLatent", methods=["POST"])
+@cross_origin()
 def changeLatent():
     data = {"success": False}
     if flask.request.files != None:
