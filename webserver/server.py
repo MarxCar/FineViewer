@@ -43,7 +43,7 @@ def predict():
 
     if (params != None):
 
-        x = np.frombuffer(base64.decodebytes(params["latent"]))
+        x = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
         if x.shape == 2:
             x = x[0]
         bytesIO = io.BytesIO()
@@ -64,8 +64,8 @@ def interpolation():
     data = {"success": False}
     params = flask.request.values
     if params != None:
-        x1 = np.frombuffer(base64.decodebytes(params["latent"]))
-        x2 = np.frombuffer(base64.decodebytes(params["latent"]))
+        x1 = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
+        x2 = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
         n = int(params["n"])
         if n > 15:
             return TypeError("N cannot be greater than 15")
@@ -97,7 +97,7 @@ def randomFace():
 @cross_origin()
 def randomLatent():
     data = {"success": True}
-    data["latent"] = base64.b64encode(noise(1))
+    data["latent"] = base64.b64encode(noise(1), dtype=np.float64)
     return flask.jsonify(data)
 
 
