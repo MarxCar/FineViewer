@@ -38,20 +38,22 @@ model.load(61)
 def predict():
     data = {"success": False}
 
-    params = flask.request.files
+    params = flask.request.values
 
-    # if parameters are found, return a prediction
-    print(flask.request.files)
+
     if (params != None):
 
-        x = np.load(params["latent"])
+        x = np.frombuffer(base64.decodebytes(params["latent"]))
+        if x.shape == 2:
+            x = x[0]
         bytesIO = io.BytesIO()
 
         with graph.as_default():
             image = Image.fromarray(model.imageFromLatent(x).reshape(64, 64, 3))
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
-            return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
+            data["image"] = base64.b64encode(bytesIO.getvalue())
+            return flask.jsonify(data)
     else:
         return flask.jsonify(data)
 
@@ -60,11 +62,11 @@ def predict():
 @cross_origin()
 def interpolation():
     data = {"success": False}
-    params = flask.request.files
+    params = flask.request.values
     if params != None:
-        x1 = np.load(params["latent1"])
-        x2 = np.load(params["latent2"])
-        n = int(flask.request.values["n"])
+        x1 = np.frombuffer(base64.decodebytes(params["latent"]))
+        x2 = np.frombuffer(base64.decodebytes(params["latent"]))
+        n = int(params["n"])
         if n > 15:
             return TypeError("N cannot be greater than 15")
         bytesIO = io.BytesIO()
@@ -74,7 +76,8 @@ def interpolation():
 
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
-            return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
+            data["image"] = base64.b64encode(bytesIO.getvalue())
+            return flask.jsonify(data)
     else:
         return flask.jsonify(data)
 
@@ -83,19 +86,19 @@ def interpolation():
 def randomFace():
     bytesIO = io.BytesIO()
     data = {"success": True}
+
     with graph.as_default():
         image = Image.fromarray(model.imageFromLatent(noise(1)))
         image.convert("RGB").save(bytesIO, format="PNG")
-	data["image"] = base64.b64encode(bytesIO.getvalue());
-	return flask.jsonify(data)
+        data["image"] = base64.b64encode(bytesIO.getvalue());
+        return flask.jsonify(data)
 
 @app.route("/randomLatent", methods=["GET"])
 @cross_origin()
 def randomLatent():
-    bytesIO = io.BytesIO()
-    np.save(bytesIO, noise(1))
-    bytesIO.seek(0)
-    return flask.send_file(bytesIO, as_attachment=True, attachment_filename="latent.npy")
+    data = {"success": True}
+    data["latent"] = base64.b64encode(noise(1))
+    return flask.jsonify(data)
 
 
 @app.route("/changeLatent", methods=["POST"])
@@ -103,7 +106,7 @@ def randomLatent():
 def changeLatent():
     data = {"success": False}
     if flask.request.files != None:
-        latent = np.load(flask.request.files["latent"])[0]
+        latent = np.frombuffer(base64.decodebytes(flask.values["latent"]))[0]
         dim = int(flask.request.values["dimension"])
         operator = flask.request.values["operator"]
         bytesIO = io.BytesIO()
@@ -118,7 +121,8 @@ def changeLatent():
             image = Image.fromarray(image)
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
-            return flask.send_file(bytesIO, as_attachment=False, mimetype="image/png")
+            data["latent"] = base64.b64encode(bytesIO.getvalue())
+            return flask.jsonify(data)
 
-# start the flask app, allow remote connections 
+# start the flask app, allow remote connections
 app.run(host='0.0.0.0')
