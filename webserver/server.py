@@ -123,6 +123,17 @@ def changeLatent():
             data["latent"] = base64.b64encode(bytesIO.getvalue())
             data["success"] = True
             return flask.jsonify(data)
+@app.route("/getSliderValue", methods=["POST"])
+@cross_origin()
+def getSliderValue():
+    data = {"success": False}
+    params = flask.request.json
+    if params != None:
+	latent = np.frombuffer(base64.b64decode(params["latent"]))
+	n = int(params["dimension"])
+	data["id"] = model.getClosestID(latent, n)
+	data["success"] = True
+    return flask.jsonify(data)
 
 # start the flask app, allow remote connections
 app.run(host='0.0.0.0', debug=True)

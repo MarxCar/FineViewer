@@ -481,7 +481,12 @@ class WGAN(object):
         return np.concatenate(images, axis=1)
     def imageFromLatent(self, latent):
         return np.uint8(self.generator.predict([latent.reshape(1,128), noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
+    def getClosestID(self, latent, dim):
+	val = latent[dim]
+	grid = stats.norm.ppf(np.linspace(0.05,0.95,10))
+	idx = (np.abs(grid-val)).argmin()
 
+	return idx + 1
     def addToLatent(self, latent, dim):
         val = latent[dim]
         grid = stats.norm.ppf(np.linspace(0.05,0.95, 10))
@@ -500,3 +505,4 @@ class WGAN(object):
         if idx != 0:
             latent[dim] = grid[idx-1]
         return self.imageFromLatent(latent.reshape(1,128))
+
