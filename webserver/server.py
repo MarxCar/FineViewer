@@ -37,22 +37,19 @@ model.load(61)
 @cross_origin()
 def predict():
     data = {"success": False}
-
-    params = flask.request.values
-
-
+    print(flask.request.values)
+    params = flask.request.json
     if (params != None):
-
-        x = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
-        if x.shape == 2:
-            x = x[0]
+	str = params["latent"]
+        x = np.frombuffer(base64.b64decode(str), np.float64)
         bytesIO = io.BytesIO()
-
+	print(x.shape)
         with graph.as_default():
             image = Image.fromarray(model.imageFromLatent(x).reshape(64, 64, 3))
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
             data["image"] = base64.b64encode(bytesIO.getvalue())
+            data["success"] = True
             return flask.jsonify(data)
     else:
         return flask.jsonify(data)
@@ -62,10 +59,10 @@ def predict():
 @cross_origin()
 def interpolation():
     data = {"success": False}
-    params = flask.request.values
+    params = flask.request.json
     if params != None:
-        x1 = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
-        x2 = np.frombuffer(base64.decodebytes(params["latent"]), dtype=np.float64)
+        x1 = np.frombuffer(base64.b64decode(params["latent1"]), dtype=np.float64)
+        x2 = np.frombuffer(base64.b64decode(params["latent2"]), dtype=np.float64)
         n = int(params["n"])
         if n > 15:
             return TypeError("N cannot be greater than 15")
@@ -77,6 +74,7 @@ def interpolation():
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
             data["image"] = base64.b64encode(bytesIO.getvalue())
+            data["success"] = True
             return flask.jsonify(data)
     else:
         return flask.jsonify(data)
@@ -97,7 +95,7 @@ def randomFace():
 @cross_origin()
 def randomLatent():
     data = {"success": True}
-    data["latent"] = base64.b64encode(noise(1), dtype=np.float64)
+    data["latent"] = base64.b64encode(noise(1))
     return flask.jsonify(data)
 
 
@@ -105,14 +103,15 @@ def randomLatent():
 @cross_origin()
 def changeLatent():
     data = {"success": False}
-    if flask.request.files != None:
-        latent = np.frombuffer(base64.decodebytes(flask.values["latent"]))[0]
-        dim = int(flask.request.values["dimension"])
-        operator = flask.request.values["operator"]
-        bytesIO = io.BytesIO()
+    params = flask.request.json
+    if params != None:
+        latent = np.frombuffer(base64.b64decode(params["latent"]))
+        dim = int(params["dimension"])
+	operator = params["operator"].encode("utf-8")
+	bytesIO = io.BytesIO()
+
         with graph.as_default():
             if operator == "add":
-                print(latent.shape)
                 image = model.addToLatent(latent, dim)
             elif operator == "sub":
                 image = model.subtractFromLatent(latent, dim)
@@ -122,7 +121,8 @@ def changeLatent():
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
             data["latent"] = base64.b64encode(bytesIO.getvalue())
+            data["success"] = True
             return flask.jsonify(data)
 
 # start the flask app, allow remote connections
-app.run(host='0.0.0.0')
+app.run(host='0.0.0.0', debug=True)

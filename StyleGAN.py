@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 from PIL import Image
 from math import floor
 import numpy as np
@@ -439,7 +439,6 @@ class WGAN(object):
         model.save_weights("./models/"+name+"_"+str(num)+".h5")
         
     def loadModel(self, name, num): #Load a Model
-        print(os.listdir())
         file = open("../models/"+name+".json", 'r')
         json = file.read()
         file.close()
@@ -472,22 +471,23 @@ class WGAN(object):
         self.AdModel = self.GAN.AdModel() 
     
     def interpolation(self, latent_a, latent_b, n=5):
-        weights = np.linspace(0.0,1.0, num=10)
+        weights = np.linspace(0.0,1.0, num=n)
         images = []
 
         for weight in weights:
-            temp = self.generator.predict([latent_a*(1-weight) + latent_b*weight, noiseImage(1), np.ones([1, 1])])
+            temp = self.generator.predict([(latent_a.reshape(1,128))*(1-weight) + (latent_b.reshape(1,128))*weight, noiseImage(1), np.ones([1, 1])])
             temp = np.uint8(temp.reshape(im_size,im_size,3)*255)
             images.append(temp)
         return np.concatenate(images, axis=1)
     def imageFromLatent(self, latent):
-        return np.uint8(self.generator.predict([latent, noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
+        return np.uint8(self.generator.predict([latent.reshape(1,128), noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
 
     def addToLatent(self, latent, dim):
         val = latent[dim]
         grid = stats.norm.ppf(np.linspace(0.05,0.95, 10))
 
         idx = (np.abs(grid - val)).argmin()
+	latent = np.copy(latent)
         if idx != NUM_SIZE:
             latent[dim] = grid[idx+1]
         return self.imageFromLatent(latent.reshape(1,128))
@@ -496,6 +496,7 @@ class WGAN(object):
         grid = stats.norm.ppf(np.linspace(0.05, 0.95, 10))
 
         idx = (np.abs(grid - val)).argmin()
+	latent = np.copy(latent)
         if idx != 0:
             latent[dim] = grid[idx-1]
         return self.imageFromLatent(latent.reshape(1,128))
