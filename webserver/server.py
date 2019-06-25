@@ -107,22 +107,15 @@ def changeLatent():
     if params != None:
         latent = np.frombuffer(base64.b64decode(params["latent"]))
         dim = int(params["dimension"])
-	operator = params["operator"].encode("utf-8")
+	newid = int(params["newid"])
 	bytesIO = io.BytesIO()
 
         with graph.as_default():
-            if operator == "add":
-                image = model.addToLatent(latent, dim)
-            elif operator == "sub":
-                image = model.subtractFromLatent(latent, dim)
-            else:
-                return flask.jsonify(data)
-            image = Image.fromarray(image)
-            image.convert("RGB").save(bytesIO, format="PNG")
-            bytesIO.seek(0, 0)
-            data["latent"] = base64.b64encode(bytesIO.getvalue())
+
+            latent = model.changeLatent(latent, dim, newid)
+            data["latent"] = base64.b64encode(latent)
             data["success"] = True
-            return flask.jsonify(data)
+    return flask.jsonify(data)
 @app.route("/getSliderValue", methods=["POST"])
 @cross_origin()
 def getSliderValue():

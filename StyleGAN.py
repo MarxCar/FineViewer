@@ -505,4 +505,10 @@ class WGAN(object):
         if idx != 0:
             latent[dim] = grid[idx-1]
         return self.imageFromLatent(latent.reshape(1,128))
+    def changeLatent(self, latent, dim, newid):
+	val = latent[dim]
+	grid = stats.norm.ppf(np.linspace(0.05, 0.95,10))
 
+	latent = np.copy(latent)
+	latent[dim] = grid[newid-1]
+	return latent.reshape(1,128)
