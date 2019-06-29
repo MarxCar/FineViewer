@@ -5,9 +5,6 @@ import numpy as np
 import time
 from functools import partial
 from random import random
-from keras.preprocessing.image import ImageDataGenerator
-import tensorflow as tf
-import matplotlib.pyplot as plt
 import os
 
 #Config Stuff
@@ -44,23 +41,7 @@ def fixed_generator(gen):
 
 #This is the REAL data generator, which can take images from disk and temporarily use them in your program.
 #Probably could/should get optimized at some point
-class dataGenerator(object):
-    
-    def __init__(self, loc, n, flip = True, suffix = 'png'):
-        self.loc = "data/"+loc
-        datagen = ImageDataGenerator(
-        rescale=1./255,
-        horizontal_flip=True)
-        
-        image_data_generator_big = datagen.flow_from_directory("./data/",
-        target_size=(64,64), batch_size=BATCH_SIZE,
-        class_mode=None, color_mode="rgb")
-        
-        self.generator = image_data_generator_big
-    
-    def get_batch(self, amount):
-        
-        return next(self.generator)
+
 
 #Imports for layers and models
 from keras.layers import Conv2D, Dense, AveragePooling2D, LeakyReLU, Activation
@@ -482,17 +463,17 @@ class WGAN(object):
     def imageFromLatent(self, latent):
         return np.uint8(self.generator.predict([latent.reshape(1,128), noiseImage(1), np.ones([1, 1])]).reshape(im_size,im_size,3)*255)
     def getClosestID(self, latent, dim):
-	val = latent[dim]
-	grid = stats.norm.ppf(np.linspace(0.05,0.95,10))
-	idx = (np.abs(grid-val)).argmin()
+        val = latent[dim]
+        grid = stats.norm.ppf(np.linspace(0.05,0.95,10))
+        idx = (np.abs(grid-val)).argmin()
+        return idx + 1
 
-	return idx + 1
     def addToLatent(self, latent, dim):
         val = latent[dim]
         grid = stats.norm.ppf(np.linspace(0.05,0.95, 10))
 
         idx = (np.abs(grid - val)).argmin()
-	latent = np.copy(latent)
+        latent = np.copy(latent)
         if idx != NUM_SIZE:
             latent[dim] = grid[idx+1]
         return self.imageFromLatent(latent.reshape(1,128))
@@ -501,14 +482,14 @@ class WGAN(object):
         grid = stats.norm.ppf(np.linspace(0.05, 0.95, 10))
 
         idx = (np.abs(grid - val)).argmin()
-	latent = np.copy(latent)
+        latent = np.copy(latent)
         if idx != 0:
             latent[dim] = grid[idx-1]
         return self.imageFromLatent(latent.reshape(1,128))
     def changeLatent(self, latent, dim, newid):
-	val = latent[dim]
-	grid = stats.norm.ppf(np.linspace(0.05, 0.95,10))
+        val = latent[dim]
+        grid = stats.norm.ppf(np.linspace(0.05, 0.95,10))
 
-	latent = np.copy(latent)
-	latent[dim] = grid[newid-1]
-	return latent.reshape(1,128)
+        latent = np.copy(latent)
+        latent[dim] = grid[newid-1]
+        return latent.reshape(1,128)
