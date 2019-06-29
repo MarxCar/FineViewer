@@ -420,13 +420,13 @@ class WGAN(object):
         model.save_weights("./models/"+name+"_"+str(num)+".h5")
         
     def loadModel(self, name, num): #Load a Model
-        file = open("../models/"+name+".json", 'r')
+        file = open("./models/"+name+".json", 'r')
         json = file.read()
         file.close()
         
         mod = model_from_json(json, custom_objects = {'AdaInstanceNormalization': AdaInstanceNormalization})
         
-        mod.load_weights("../models/"+name+"_"+str(num)+".h5")
+        mod.load_weights("./models/"+name+"_"+str(num)+".h5")
         
         return mod
     

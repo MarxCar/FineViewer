@@ -29,6 +29,9 @@ graph = tf.get_default_graph()
 model = WGAN(lr=0.0003, silent=False)
 model.load(61)
 
+# Helper
+def encode(obj):
+    return base64.b64encode(obj).decode("utf-8")
 
 # define a predict function as an endpoint
 @app.route("/predict", methods=["POST"])
@@ -38,15 +41,15 @@ def predict():
     print(flask.request.values)
     params = flask.request.json
     if (params != None):
-	str = params["latent"]
+        str = params["latent"]
         x = np.frombuffer(base64.b64decode(str), np.float64)
         bytesIO = io.BytesIO()
-	print(x.shape)
+
         with graph.as_default():
             image = Image.fromarray(model.imageFromLatent(x).reshape(64, 64, 3))
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
-            data["image"] = base64.b64encode(bytesIO.getvalue())
+            data["image"] = encode(bytesIO.getvalue())
             data["success"] = True
             return flask.jsonify(data)
     else:
@@ -71,7 +74,7 @@ def interpolation():
 
             image.convert("RGB").save(bytesIO, format="PNG")
             bytesIO.seek(0, 0)
-            data["image"] = base64.b64encode(bytesIO.getvalue())
+            data["image"] = encode(bytesIO.getvalue())
             data["success"] = True
             return flask.jsonify(data)
     else:
@@ -86,14 +89,14 @@ def randomFace():
     with graph.as_default():
         image = Image.fromarray(model.imageFromLatent(noise(1)))
         image.convert("RGB").save(bytesIO, format="PNG")
-        data["image"] = base64.b64encode(bytesIO.getvalue());
+        data["image"] = encode(bytesIO.getvalue());
         return flask.jsonify(data)
 
 @app.route("/randomLatent", methods=["GET"])
 @cross_origin()
 def randomLatent():
     data = {"success": True}
-    data["latent"] = base64.b64encode(noise(1))
+    data["latent"] = encode(noise(1))
     return flask.jsonify(data)
 
 
@@ -105,13 +108,13 @@ def changeLatent():
     if params != None:
         latent = np.frombuffer(base64.b64decode(params["latent"]))
         dim = int(params["dimension"])
-	newid = int(params["newid"])
-	bytesIO = io.BytesIO()
+        newid = int(params["newid"])
+        bytesIO = io.BytesIO()
 
         with graph.as_default():
 
             latent = model.changeLatent(latent, dim, newid)
-            data["latent"] = base64.b64encode(latent)
+            data["latent"] = encode(latent)
             data["success"] = True
     return flask.jsonify(data)
 @app.route("/getSliderValue", methods=["POST"])
@@ -120,10 +123,10 @@ def getSliderValue():
     data = {"success": False}
     params = flask.request.json
     if params != None:
-	latent = np.frombuffer(base64.b64decode(params["latent"]))
-	n = int(params["dimension"])
-	data["id"] = model.getClosestID(latent, n)
-	data["success"] = True
+        latent = np.frombuffer(base64.b64decode(params["latent"]))
+        n = int(params["dimension"])
+        data["id"] = model.getClosestID(latent, n)
+        data["success"] = True
     return flask.jsonify(data)
 
 # start the flask app, allow remote connections
